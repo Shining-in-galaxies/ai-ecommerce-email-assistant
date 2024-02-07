@@ -6,7 +6,7 @@ A web application leveraging Python, Flask, and OpenAI API to facilitate e-comme
 
 ## Presentation
 
-View presentation [PDF file]()
+View presentation [PDF file](https://drive.google.com/file/d/1KQR3ODE5WfpmS47ECYmoupwww_cSpAGl/view?usp=sharing)
 
 ## Features
 
