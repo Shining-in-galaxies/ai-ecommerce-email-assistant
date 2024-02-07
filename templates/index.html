@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Commerce Email Assistant</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <!-- div: header -->
+    <div class="header">
+      <h1 class="line1">AI-Driven</h1>
+      <h1 class="line2">E-Commerce Email Assistant</h1>
+    </div>
+    <!-- div: end of header -->
+
+    <div class="process">
+      <!-- customer review -->
+      <div class="review">
+        <form id="reviewForm">
+          <label for="customer_review">Customer Review</label>
+          <br />
+          <textarea id="customer_review" name="customer_review"></textarea>
+          <br />
+          <button type="button" onclick="generateEmail()">
+            Generate Email Text
+          </button>
+        </form>
+      </div>
+      <!-- end of customer review -->
+      <br />
+      <!-- generated email text -->
+      <div class="gen_email">
+        <label for="generated_email">Generated Email Text</label>
+        <textarea
+          id="generated_email"
+          name="generated_email"
+          style="display: block"
+        ></textarea>
+      </div>
+      <!-- end of generated email text -->
+      <br />
+      <!-- generated translation -->
+      <div class="gen_translation">
+        <div id="translation_prompt" style="display: none">
+          <p>Do you want a translated version of the generated email?</p>
+          <label for="language_selector">Select your language:</label>
+          <select id="language_selector">
+            <option value="en">English</option>
+            <option value="zh">Chinese</option>
+            <option value="es">Spanish</option>
+          </select>
+          <button type="button" onclick="requestTranslation()">Confirm</button>
+        </div>
+
+        <script>
+          function generateEmail() {
+            var review = $("#customer_review").val();
+            $.ajax({
+              url: "/generate_email",
+              type: "POST",
+              contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+              data: { customer_review: review },
+              success: function (response) {
+                $("#generated_email").show().val(response.email_content);
+                $("#translation_prompt").show();
+                // 清除之前的翻译结果文本框
+                $(".translated_email").remove();
+              },
+              error: function (xhr, status, error) {
+                console.error("Error: " + status + " " + error);
+              },
+            });
+          }
+
+          function requestTranslation() {
+            var emailContent = $("#generated_email").val();
+            var selectedLanguage = $("#language_selector").val();
+            $.ajax({
+              url: "/translate_email",
+              type: "POST",
+              contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+              data: {
+                email_content: emailContent,
+                target_language: selectedLanguage,
+              },
+              success: function (response) {
+                // 隐藏上一个翻译结果
+                $(".translated_email").hide();
+                // 创建一个新的文本框用于显示这次的翻译结果
+                var newTextArea = $(
+                  '<textarea class="translated_email" style="display: block;"></textarea>'
+                );
+                newTextArea.val(response.translated_email);
+                // 将新的文本框添加到页面上
+                $("#translation_prompt").after(newTextArea);
+              },
+              error: function (xhr, status, error) {
+                console.error("Error: " + status + " " + error);
+              },
+            });
+          }
+        </script>
+      </div>
+      <!-- end of generated translation -->
+    </div>
+  </body>
+</html>
